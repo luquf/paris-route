@@ -2,29 +2,29 @@ package paris.route;
 
 public class DirectedEdge implements Comparable<DirectedEdge> {
 	
-	private int from;
-	private int to;
+	private Vertex from;
+	private Vertex to;
 	private double weight;
 	
-	public DirectedEdge(int from, int to, double weight) {
+	public DirectedEdge(Vertex from, Vertex to, double weight) {
 		this.from = from;
 		this.to = to;
 		this.weight = weight;
 	}
 	
-	public int getFrom() {
+	public Vertex getFrom() {
 		return from;
 	}
 
-	public void setFrom(int from) {
+	public void setFrom(Vertex from) {
 		this.from = from;
 	}
 
-	public int getTo() {
+	public Vertex getTo() {
 		return to;
 	}
 
-	public void setTo(int to) {
+	public void setTo(Vertex to) {
 		this.to = to;
 	}
 
