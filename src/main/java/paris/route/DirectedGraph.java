@@ -5,9 +5,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,6 +19,7 @@ public class DirectedGraph {
 
 	private int n;
 	private int m;
+	private Map<String, Vertex> vertices;
 	private HashMap<String, List<DirectedEdge>> adj;
 
 	public DirectedGraph() throws IOException {
@@ -23,7 +27,7 @@ public class DirectedGraph {
 		System.out.println("Building graph...");
 		this.adj = new HashMap<String, List<DirectedEdge>>();
 		String data = new String(Files.readAllBytes(Paths.get("data/reseau.json")));
-		Map<String, Vertex> vertices = new HashMap<String, Vertex>();
+		this.vertices = new HashMap<String, Vertex>();
 
 		// Parsing stations
 		JSONObject stationsRawData = new JSONObject(data);
@@ -37,7 +41,7 @@ public class DirectedGraph {
 			double lat = Double.parseDouble((String) stationsJsonData.getJSONObject(k).get("lat"));
 			double lng = Double.parseDouble((String) stationsJsonData.getJSONObject(k).get("lng"));
 			Vertex v = new Vertex(lng, lat, nom, num, type);
-			vertices.put(num, v);
+			this.vertices.put(num, v);
 		}
 		
 		// Parsing all edges with the 'routes' element
@@ -55,22 +59,18 @@ public class DirectedGraph {
 					DirectedEdge de = new DirectedEdge(vertices.get(stops.get(j)), vertices.get(stops.get(j + 1)), 0.0);
 					lde.add(de);
 				}
-				for (int j = stops.length()-1; j > 0; j--) {
-					DirectedEdge de = new DirectedEdge(vertices.get(stops.get(j)), vertices.get(stops.get(j - 1)), 0.0);
-					lde.add(de);
-				}
 			}
 		}
 		System.out.println("Number of edges: " + lde.size());
 
-		// Parsing stations with multiple name: last thing to do
+		// Parsing stations with multiple name: last thing to do from corresp element
 		JSONObject correspRawData = new JSONObject(data);
 		JSONArray corresp = (JSONArray) correspRawData.get("corresp");
 		for (int i = 0; i < corresp.length(); i++) {
 			JSONArray cor = (JSONArray) corresp.get(i);
 			if (cor.length() == 2) {
 				DirectedEdge de1 = new DirectedEdge(vertices.get(cor.get(0)), vertices.get(cor.get(1)), 0.0);
-				DirectedEdge de2 = new DirectedEdge(vertices.get(cor.get(0)), vertices.get(cor.get(1)), 0.0);
+				DirectedEdge de2 = new DirectedEdge(vertices.get(cor.get(1)), vertices.get(cor.get(0)), 0.0);
 				lde.add(de1);
 				lde.add(de2);
 			} else {
@@ -95,8 +95,10 @@ public class DirectedGraph {
 			String from = lde.get(k).getFrom().getCode();
 			if (this.adj.containsKey(from)) {
 				List<DirectedEdge> vElement = this.adj.get(from);
-				vElement.add(lde.get(k));
-				this.adj.put(from, vElement);
+				if (!vElement.contains(lde.get(k))) {
+					vElement.add(lde.get(k));
+					this.adj.put(from, vElement);
+				}
 			} else {
 				List<DirectedEdge> vElement = new ArrayList<DirectedEdge>();
 				vElement.add(lde.get(k));
@@ -105,5 +107,29 @@ public class DirectedGraph {
 		}
 		
 		System.out.println("Done building graph...");
+	}
+	
+	public List<DirectedEdge> getSuccessors(String v) {
+		return this.adj.get(v);
+	}
+	
+	public List<Vertex> bfs(String start, String stop) {
+		List<String> visited = new ArrayList<String>();
+		List<Vertex> queue = new LinkedList<Vertex>();
+		queue.add(this.vertices.get(start));
+		while (!queue.isEmpty()) {
+			Vertex currentNode = queue.remove(0);
+			if (!visited.contains(currentNode.getCode())) {
+				visited.add(currentNode.getCode());
+				if (currentNode.getCode().matches(stop)) {
+					return queue;
+				}
+				List<DirectedEdge> edges = this.getSuccessors(currentNode.getCode());
+				for (DirectedEdge de : edges) {
+					queue.add(de.getTo());
+				}		
+			}	
+		}
+		return queue;
 	}
 }

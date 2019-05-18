@@ -4,12 +4,21 @@ public class DirectedEdge implements Comparable<DirectedEdge> {
 	
 	private Vertex from;
 	private Vertex to;
+	private String typeOfTransport;
 	private double weight;
 	
 	public DirectedEdge(Vertex from, Vertex to, double weight) {
 		this.from = from;
 		this.to = to;
 		this.weight = weight;
+	}
+	
+	public String getTypeOfTransport() {
+		return typeOfTransport;
+	}
+
+	public void setTypeOfTransport(String typeOfTransport) {
+		this.typeOfTransport = typeOfTransport;
 	}
 	
 	public Vertex getFrom() {
