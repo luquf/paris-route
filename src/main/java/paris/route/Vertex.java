@@ -4,16 +4,23 @@ public class Vertex {
 	
 	private double longitude;
 	private double lattitude;
-	private String Address;
 	private String name;
 	private String code;
+	private String type; 
 	
-	public Vertex(double longitude, double lattitude, String address, String name, String code) {
+	public Vertex(double longitude, double lattitude, String name, String code, String type) {
 		this.longitude = longitude;
 		this.lattitude = lattitude;
-		Address = address;
 		this.name = name;
 		this.code = code;
+		this.type = type;
+	}
+	
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
 	}
 	public double getLongitude() {
 		return longitude;
@@ -26,12 +33,6 @@ public class Vertex {
 	}
 	public void setLattitude(double lattitude) {
 		this.lattitude = lattitude;
-	}
-	public String getAddress() {
-		return Address;
-	}
-	public void setAddress(String address) {
-		Address = address;
 	}
 	public String getName() {
 		return name;
