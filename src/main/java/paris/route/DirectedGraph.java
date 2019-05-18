@@ -60,14 +60,35 @@ public class DirectedGraph {
 				}
 			}
 		}
-		System.out.println(lde.size());
+		System.out.println("Number of edges: " + lde.size());
 
 		// Parsing stations with multiple name: last thing to do
 		JSONObject correspRawData = new JSONObject(data);
 		JSONArray corresp = (JSONArray) correspRawData.get("corresp");
 		for (int i = 0; i < corresp.length(); i++) {
-			// System.out.println(corresp.get(i));
+			JSONArray cor = (JSONArray) corresp.get(i);
+			if (cor.length() == 2) {
+				DirectedEdge de1 = new DirectedEdge(vertices.get(cor.get(0)), vertices.get(cor.get(1)), 0.0);
+				DirectedEdge de2 = new DirectedEdge(vertices.get(cor.get(0)), vertices.get(cor.get(1)), 0.0);
+				lde.add(de1);
+				lde.add(de2);
+			} else {
+				DirectedEdge de1 = new DirectedEdge(vertices.get(cor.get(0)), vertices.get(cor.get(1)), 0.0);
+				DirectedEdge de2 = new DirectedEdge(vertices.get(cor.get(1)), vertices.get(cor.get(0)), 0.0);
+				DirectedEdge de3 = new DirectedEdge(vertices.get(cor.get(1)), vertices.get(cor.get(2)), 0.0);
+				DirectedEdge de4 = new DirectedEdge(vertices.get(cor.get(2)), vertices.get(cor.get(1)), 0.0);
+				DirectedEdge de5 = new DirectedEdge(vertices.get(cor.get(0)), vertices.get(cor.get(2)), 0.0);
+				DirectedEdge de6 = new DirectedEdge(vertices.get(cor.get(2)), vertices.get(cor.get(0)), 0.0);
+				lde.add(de1);
+				lde.add(de2);
+				lde.add(de3);
+				lde.add(de4);
+				lde.add(de5);
+				lde.add(de6);
+			}
 		}
+		
+		System.out.println("Number of edges: " + lde.size());
 
 		System.out.println("Done building graph...");
 	}
