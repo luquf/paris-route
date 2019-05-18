@@ -21,6 +21,7 @@ public class DirectedGraph {
 	public DirectedGraph() throws IOException {
 
 		System.out.println("Building graph...");
+		this.adj = new HashMap<String, List<DirectedEdge>>();
 		String data = new String(Files.readAllBytes(Paths.get("data/reseau.json")));
 		Map<String, Vertex> vertices = new HashMap<String, Vertex>();
 
@@ -88,8 +89,21 @@ public class DirectedGraph {
 			}
 		}
 		
-		System.out.println("Number of edges: " + lde.size());
-
+		// Building the graph
+		
+		for (int k = 0; k < lde.size(); k++) {
+			String from = lde.get(k).getFrom().getCode();
+			if (this.adj.containsKey(from)) {
+				List<DirectedEdge> vElement = this.adj.get(from);
+				vElement.add(lde.get(k));
+				this.adj.put(from, vElement);
+			} else {
+				List<DirectedEdge> vElement = new ArrayList<DirectedEdge>();
+				vElement.add(lde.get(k));
+				this.adj.put(from, vElement);
+			}
+		}
+		
 		System.out.println("Done building graph...");
 	}
 }
