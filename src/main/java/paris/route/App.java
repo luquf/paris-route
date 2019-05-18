@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public class App {
     public static void main( String[] args ) throws IOException {
-    	Graph g = new Graph();
+    	DirectedGraph g = new DirectedGraph();
     }
 }
 
