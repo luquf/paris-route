@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -173,11 +174,7 @@ public class DirectedGraph {
 					if (!visited.contains(de.getTo().getCode())) {
 						shortestPath.put(de.getTo().getCode(), de.getFrom().getCode());
 					}
-					if (de.getTo().getType() != de.getFrom().getType()) {
-						queue.add(new DestinationVertexWithCost(de.getTo(), de.getWeight()+1));
-					} else {
-						queue.add(new DestinationVertexWithCost(de.getTo(), de.getWeight()));
-					}
+					queue.add(new DestinationVertexWithCost(de.getTo(), de.getWeight()));
 					
 				}	
 			}	

@@ -24,7 +24,7 @@ public class App {
     	}
     	Collections.reverse(finalPath);
     	for (int i = 0; i < finalPath.size(); i++) {
-    		//System.out.println(g.getVertices().get(finalPath.get(i)).getName() + " (" + g.getVertices().get(finalPath.get(i)).getType() + ")");
+    		System.out.println(g.getVertices().get(finalPath.get(i)).getName() + " (" + g.getVertices().get(finalPath.get(i)).getType() + ")");
     	}
     }
 }
