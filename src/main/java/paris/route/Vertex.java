@@ -6,7 +6,7 @@ public class Vertex {
 	private double lattitude;
 	private String name;
 	private String code;
-	private String type; 
+	private String type;
 	
 	public Vertex(double longitude, double lattitude, String name, String code, String type) {
 		this.longitude = longitude;

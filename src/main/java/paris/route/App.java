@@ -9,8 +9,8 @@ import java.util.Map;
 public class App {
     public static void main( String[] args ) throws IOException {
     	DirectedGraph g = new DirectedGraph();
-    	String start = "A_1894";
-    	String stop = "1909";
+    	String start = "A_1631";
+    	String stop = "1635";
     	Map<String, String> path = g.bfs(start, stop);
     	List<String> finalPath = new ArrayList<String>();
     	finalPath.add(stop);
@@ -24,7 +24,7 @@ public class App {
     	}
     	Collections.reverse(finalPath);
     	for (int i = 0; i < finalPath.size(); i++) {
-    		System.out.println(finalPath.get(i));
+    		System.out.println(g.getVertices().get(finalPath.get(i)).getName() + " (" + g.getVertices().get(finalPath.get(i)).getType() + ")");
     	}
     }
 }
