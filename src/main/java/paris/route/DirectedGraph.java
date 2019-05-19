@@ -5,12 +5,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -56,7 +56,11 @@ public class DirectedGraph {
 			} else {
 				JSONArray stops = (JSONArray)routeObject.get("arrets");
 				for (int j = 0; j < stops.length()-1; j++) {
-					DirectedEdge de = new DirectedEdge(vertices.get(stops.get(j)), vertices.get(stops.get(j + 1)), 0.0);
+					double dist = Math.sqrt(
+							Math.pow(vertices.get(stops.get(j)).getLongitude() - vertices.get(stops.get(j+1)).getLongitude(), 2) + 
+							Math.pow(vertices.get(stops.get(j)).getLattitude() - vertices.get(stops.get(j+1)).getLattitude(), 2)
+							);
+					DirectedEdge de = new DirectedEdge(vertices.get(stops.get(j)), vertices.get(stops.get(j + 1)), dist);
 					lde.add(de);
 				}
 			}
@@ -68,17 +72,33 @@ public class DirectedGraph {
 		for (int i = 0; i < corresp.length(); i++) {
 			JSONArray cor = (JSONArray) corresp.get(i);
 			if (cor.length() == 2) {
-				DirectedEdge de1 = new DirectedEdge(vertices.get(cor.get(0)), vertices.get(cor.get(1)), 0.0);
-				DirectedEdge de2 = new DirectedEdge(vertices.get(cor.get(1)), vertices.get(cor.get(0)), 0.0);
+				double dist = Math.sqrt(
+					Math.pow(vertices.get(cor.get(0)).getLongitude() - vertices.get(cor.get(1)).getLongitude(), 2) + 
+					Math.pow(vertices.get(cor.get(0)).getLattitude() - vertices.get(cor.get(1)).getLattitude(), 2)
+					);
+				DirectedEdge de1 = new DirectedEdge(vertices.get(cor.get(0)), vertices.get(cor.get(1)), dist);
+				DirectedEdge de2 = new DirectedEdge(vertices.get(cor.get(1)), vertices.get(cor.get(0)), dist);
 				lde.add(de1);
 				lde.add(de2);
 			} else {
-				DirectedEdge de1 = new DirectedEdge(vertices.get(cor.get(0)), vertices.get(cor.get(1)), 0.0);
-				DirectedEdge de2 = new DirectedEdge(vertices.get(cor.get(1)), vertices.get(cor.get(0)), 0.0);
-				DirectedEdge de3 = new DirectedEdge(vertices.get(cor.get(1)), vertices.get(cor.get(2)), 0.0);
-				DirectedEdge de4 = new DirectedEdge(vertices.get(cor.get(2)), vertices.get(cor.get(1)), 0.0);
-				DirectedEdge de5 = new DirectedEdge(vertices.get(cor.get(0)), vertices.get(cor.get(2)), 0.0);
-				DirectedEdge de6 = new DirectedEdge(vertices.get(cor.get(2)), vertices.get(cor.get(0)), 0.0);
+				double dist = Math.sqrt(
+						Math.pow(vertices.get(cor.get(0)).getLongitude() - vertices.get(cor.get(1)).getLongitude(), 2) + 
+						Math.pow(vertices.get(cor.get(0)).getLattitude() - vertices.get(cor.get(1)).getLattitude(), 2)
+						);
+				DirectedEdge de1 = new DirectedEdge(vertices.get(cor.get(0)), vertices.get(cor.get(1)), dist);
+				DirectedEdge de2 = new DirectedEdge(vertices.get(cor.get(1)), vertices.get(cor.get(0)), dist);
+				dist = Math.sqrt(
+						Math.pow(vertices.get(cor.get(1)).getLongitude() - vertices.get(cor.get(2)).getLongitude(), 2) + 
+						Math.pow(vertices.get(cor.get(1)).getLattitude() - vertices.get(cor.get(2)).getLattitude(), 2)
+						);
+				DirectedEdge de3 = new DirectedEdge(vertices.get(cor.get(1)), vertices.get(cor.get(2)), dist);
+				DirectedEdge de4 = new DirectedEdge(vertices.get(cor.get(2)), vertices.get(cor.get(1)), dist);
+				dist = Math.sqrt(
+						Math.pow(vertices.get(cor.get(0)).getLongitude() - vertices.get(cor.get(2)).getLongitude(), 2) + 
+						Math.pow(vertices.get(cor.get(0)).getLattitude() - vertices.get(cor.get(2)).getLattitude(), 2)
+						);
+				DirectedEdge de5 = new DirectedEdge(vertices.get(cor.get(0)), vertices.get(cor.get(2)), dist);
+				DirectedEdge de6 = new DirectedEdge(vertices.get(cor.get(2)), vertices.get(cor.get(0)), dist);
 				lde.add(de1);
 				lde.add(de2);
 				lde.add(de3);
@@ -136,7 +156,44 @@ public class DirectedGraph {
 		return shortestPath;
 	}
 	
+	public Map<String, String> dijkstra(String start, String stop) {
+		List<String> visited = new ArrayList<String>();
+		Queue<DestinationVertexWithCost> queue = new PriorityQueue<DestinationVertexWithCost>();
+		Map<String, String> shortestPath = new HashMap<String, String>();
+		queue.add(new DestinationVertexWithCost(this.vertices.get(start), 0));
+		while (!queue.isEmpty()) {
+			DestinationVertexWithCost currentNode = queue.remove();
+			if (!visited.contains(currentNode.getV().getCode())) {
+				visited.add(currentNode.getV().getCode());
+				if (currentNode.getV().getCode().matches(stop)) {
+					return shortestPath;
+				}
+				List<DirectedEdge> edges = this.getSuccessors(currentNode.getV().getCode());
+				for (DirectedEdge de : edges) {
+					if (!visited.contains(de.getTo().getCode())) {
+						shortestPath.put(de.getTo().getCode(), de.getFrom().getCode());
+					}
+					if (de.getTo().getType() != de.getFrom().getType()) {
+						queue.add(new DestinationVertexWithCost(de.getTo(), de.getWeight()+1));
+					} else {
+						queue.add(new DestinationVertexWithCost(de.getTo(), de.getWeight()));
+					}
+					
+				}	
+			}	
+		}
+		return shortestPath;
+	}
+	
 	public Map<String, Vertex> getVertices() {
 		return this.vertices;
+	}
+	
+	public HashMap<String, List<DirectedEdge>> getAdj() {
+		return adj;
+	}
+
+	public void setAdj(HashMap<String, List<DirectedEdge>> adj) {
+		this.adj = adj;
 	}
 }
