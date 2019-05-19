@@ -61,7 +61,6 @@ public class DirectedGraph {
 				}
 			}
 		}
-		System.out.println("Number of edges: " + lde.size());
 
 		// Parsing stations with multiple name: last thing to do from corresp element
 		JSONObject correspRawData = new JSONObject(data);
@@ -113,23 +112,31 @@ public class DirectedGraph {
 		return this.adj.get(v);
 	}
 	
-	public List<Vertex> bfs(String start, String stop) {
+	public Map<String, String> bfs(String start, String stop) {
 		List<String> visited = new ArrayList<String>();
 		List<Vertex> queue = new LinkedList<Vertex>();
+		Map<String, String> shortestPath = new HashMap<String, String>();
 		queue.add(this.vertices.get(start));
 		while (!queue.isEmpty()) {
 			Vertex currentNode = queue.remove(0);
 			if (!visited.contains(currentNode.getCode())) {
 				visited.add(currentNode.getCode());
 				if (currentNode.getCode().matches(stop)) {
-					return queue;
+					return shortestPath;
 				}
 				List<DirectedEdge> edges = this.getSuccessors(currentNode.getCode());
 				for (DirectedEdge de : edges) {
+					if (!visited.contains(de.getTo().getCode())) {
+						shortestPath.put(de.getTo().getCode(), de.getFrom().getCode());
+					}
 					queue.add(de.getTo());
-				}		
+				}	
 			}	
 		}
-		return queue;
+		return shortestPath;
+	}
+	
+	public Map<String, Vertex> getVertices() {
+		return this.vertices;
 	}
 }
