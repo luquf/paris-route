@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -12,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Stack;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -151,6 +151,30 @@ public class DirectedGraph {
 						shortestPath.put(de.getTo().getCode(), de.getFrom().getCode());
 					}
 					queue.add(de.getTo());
+				}	
+			}	
+		}
+		return shortestPath;
+	}
+	
+	public Map<String, String> dfs(String start, String stop) {
+		List<String> visited = new ArrayList<String>();
+		Stack<Vertex> stack = new Stack<Vertex>();
+		Map<String, String> shortestPath = new HashMap<String, String>();
+		stack.add(this.vertices.get(start));
+		while (!stack.isEmpty()) {
+			Vertex currentNode = stack.pop();
+			if (!visited.contains(currentNode.getCode())) {
+				visited.add(currentNode.getCode());
+				if (currentNode.getCode().matches(stop)) {
+					return shortestPath;
+				}
+				List<DirectedEdge> edges = this.getSuccessors(currentNode.getCode());
+				for (DirectedEdge de : edges) {
+					if (!visited.contains(de.getTo().getCode())) {
+						shortestPath.put(de.getTo().getCode(), de.getFrom().getCode());
+					}
+					stack.add(de.getTo());
 				}	
 			}	
 		}
