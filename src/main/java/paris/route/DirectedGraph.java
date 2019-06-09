@@ -27,12 +27,13 @@ public class DirectedGraph {
 
 		System.out.println("Building graph...");
 		this.adj = new HashMap<String, List<DirectedEdge>>();
-		String data = new String(Files.readAllBytes(Paths.get("data/reseau.json")));
 		this.vertices = new HashMap<String, Vertex>();
 
+		// Object in charge of parsing the data file 
+		JsonParser parser = new JsonParser();
+		
 		// Parsing stations
-		JSONObject stationsRawData = new JSONObject(data);
-		JSONObject stationsJsonData = (JSONObject) stationsRawData.get("stations");
+		JSONObject stationsJsonData = parser.getStations();
 		Iterator<String> keys = stationsJsonData.keys();
 		while (keys.hasNext()) {
 			String k = keys.next();
@@ -46,8 +47,7 @@ public class DirectedGraph {
 		}
 		
 		// Parsing all edges with the 'routes' element
-		JSONObject routesRawData = new JSONObject(data);
-		JSONArray routesJsonArray = (JSONArray) routesRawData.get("routes");
+		JSONArray routesJsonArray = parser.getRoutes();
 		List<DirectedEdge> lde = new ArrayList<DirectedEdge>();  
 		for (int i = 0; i < routesJsonArray.length(); i++) {
 			JSONObject routeObject = (JSONObject)routesJsonArray.get(i);
@@ -68,8 +68,7 @@ public class DirectedGraph {
 		}
 
 		// Parsing stations with multiple name: last thing to do from corresp element
-		JSONObject correspRawData = new JSONObject(data);
-		JSONArray corresp = (JSONArray) correspRawData.get("corresp");
+		JSONArray corresp = parser.getCorresp();
 		for (int i = 0; i < corresp.length(); i++) {
 			JSONArray cor = (JSONArray) corresp.get(i);
 			if (cor.length() == 2) {
@@ -84,26 +83,23 @@ public class DirectedGraph {
 			} else {
 				double dist = Math.sqrt(
 						Math.pow(vertices.get(cor.get(0)).getLongitude() - vertices.get(cor.get(1)).getLongitude(), 2) + 
-						Math.pow(vertices.get(cor.get(0)).getLattitude() - vertices.get(cor.get(1)).getLattitude(), 2)
-						);
+						Math.pow(vertices.get(cor.get(0)).getLattitude() - vertices.get(cor.get(1)).getLattitude(), 2));
 				DirectedEdge de1 = new DirectedEdge(vertices.get(cor.get(0)), vertices.get(cor.get(1)), dist);
 				DirectedEdge de2 = new DirectedEdge(vertices.get(cor.get(1)), vertices.get(cor.get(0)), dist);
-				dist = Math.sqrt(
-						Math.pow(vertices.get(cor.get(1)).getLongitude() - vertices.get(cor.get(2)).getLongitude(), 2) + 
-						Math.pow(vertices.get(cor.get(1)).getLattitude() - vertices.get(cor.get(2)).getLattitude(), 2)
-						);
-				DirectedEdge de3 = new DirectedEdge(vertices.get(cor.get(1)), vertices.get(cor.get(2)), dist);
-				DirectedEdge de4 = new DirectedEdge(vertices.get(cor.get(2)), vertices.get(cor.get(1)), dist);
-				dist = Math.sqrt(
-						Math.pow(vertices.get(cor.get(0)).getLongitude() - vertices.get(cor.get(2)).getLongitude(), 2) + 
-						Math.pow(vertices.get(cor.get(0)).getLattitude() - vertices.get(cor.get(2)).getLattitude(), 2)
-						);
-				DirectedEdge de5 = new DirectedEdge(vertices.get(cor.get(0)), vertices.get(cor.get(2)), dist);
-				DirectedEdge de6 = new DirectedEdge(vertices.get(cor.get(2)), vertices.get(cor.get(0)), dist);
 				lde.add(de1);
 				lde.add(de2);
+				dist = Math.sqrt(
+						Math.pow(vertices.get(cor.get(1)).getLongitude() - vertices.get(cor.get(2)).getLongitude(), 2) + 
+						Math.pow(vertices.get(cor.get(1)).getLattitude() - vertices.get(cor.get(2)).getLattitude(), 2));
+				DirectedEdge de3 = new DirectedEdge(vertices.get(cor.get(1)), vertices.get(cor.get(2)), dist);
+				DirectedEdge de4 = new DirectedEdge(vertices.get(cor.get(2)), vertices.get(cor.get(1)), dist);
 				lde.add(de3);
 				lde.add(de4);
+				dist = Math.sqrt(
+						Math.pow(vertices.get(cor.get(0)).getLongitude() - vertices.get(cor.get(2)).getLongitude(), 2) + 
+						Math.pow(vertices.get(cor.get(0)).getLattitude() - vertices.get(cor.get(2)).getLattitude(), 2));
+				DirectedEdge de5 = new DirectedEdge(vertices.get(cor.get(0)), vertices.get(cor.get(2)), dist);
+				DirectedEdge de6 = new DirectedEdge(vertices.get(cor.get(2)), vertices.get(cor.get(0)), dist);
 				lde.add(de5);
 				lde.add(de6);
 			}

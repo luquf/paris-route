@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import gui.Window;
 
 public class App {
     public static void main( String[] args ) throws IOException {
