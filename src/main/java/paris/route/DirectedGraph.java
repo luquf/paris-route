@@ -28,7 +28,6 @@ public class DirectedGraph {
 		System.out.println("Building graph...");
 		this.adj = new HashMap<String, List<DirectedEdge>>();
 		this.vertices = new HashMap<String, Vertex>();
-
 		// Object in charge of parsing the data file 
 		JsonParser parser = new JsonParser();
 		
@@ -62,6 +61,15 @@ public class DirectedGraph {
 							Math.pow(vertices.get(stops.get(j)).getLattitude() - vertices.get(stops.get(j+1)).getLattitude(), 2)
 							);
 					DirectedEdge de = new DirectedEdge(vertices.get(stops.get(j)), vertices.get(stops.get(j + 1)), dist);
+					lde.add(de);
+				}
+				
+				for (int j = stops.length()-1; j > 0; j--) {
+					double dist = Math.sqrt(
+							Math.pow(vertices.get(stops.get(j)).getLongitude() - vertices.get(stops.get(j-1)).getLongitude(), 2) + 
+							Math.pow(vertices.get(stops.get(j)).getLattitude() - vertices.get(stops.get(j-1)).getLattitude(), 2)
+							);
+					DirectedEdge de = new DirectedEdge(vertices.get(stops.get(j)), vertices.get(stops.get(j - 1)), dist);
 					lde.add(de);
 				}
 			}
