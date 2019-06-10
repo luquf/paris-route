@@ -17,8 +17,8 @@ public class App {
     	 * Finds shortest path
     	 * */
     	
-    	Map<String, String> path = g.dijkstra(start, stop);
-//    	Map<String, String> path = g.bfs(start, stop);
+    	Map<String, String> path = g.bfs(start, stop);
+//    	Map<String, String> path = g.dijkstra(start, stop);
     	List<String> finalPath = new ArrayList<String>();
     	finalPath.add(stop);
     	String parent = path.get(stop);
